@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 ---
 title: "Avocados"
 output: html_notebook
@@ -120,3 +121,116 @@ plot <- ggplot(data=sorted, aes(x=reorder(as.factor(region), -avgVolume), y=Aver
 print(plot)
 ```
 
+=======
+---
+title: "Avocados"
+output:
+  html_document:
+    df_print: paged
+---
+
+https://www.kaggle.com/neuromusic/avocado-prices/version/1#
+
+
+# In which cities can millenials have their avocado toast AND buy a home?
+
+## Was the Avocadopocalypse of 2017 real?
+
+# Some relevant columns in the dataset:
+
+1. Date - The date of the observation
+2. AveragePrice - the average price of a single avocado
+3. type - conventional or organic
+4. year - the year
+5. Region - the city or region of the observation
+6. Total Volume - Total number of avocados sold
+7. 4046 - Total number of avocados with PLU 4046 sold
+8. 4225 - Total number of avocados with PLU 4225 sold
+9. 4770 - Total number of avocados with PLU 4770 sold
+
+## Import libraries
+
+```{r}
+# Import libraries
+
+library(ggplot2)
+library(plyr)
+library(dplyr)
+library(gridExtra)
+library(lubridate)
+```
+
+
+## Data import and column casting
+
+```{r}
+# Import dataset CSV and explicitly cast each column type
+
+avocados <- read.table(
+  file = "C:/Users/Eirika/Documents/Code/Datasets/avocado-prices/avocado.csv",
+  sep = ",", header = TRUE,
+  colClasses =  ( 
+    c(
+      "integer", 
+      "character",
+      "numeric",
+      "numeric",
+      "numeric",
+      "numeric",
+      "numeric",
+      "numeric",
+      "numeric",
+      "numeric",
+      "numeric",
+      "character",
+      "integer",
+      "character"
+    )
+  ))
+
+# Convert date column to ymd format
+
+avocados$Date <- ymd(avocados$Date)
+
+```
+
+## Average price of avocados per year
+
+```{r}
+
+# Select average price and group by year
+# Remove above 99th percentile of average price
+
+avg_avocados <- avocados %>%
+  select(AveragePrice,year) %>%
+  group_by(year) %>%
+  filter(AveragePrice < quantile(AveragePrice, 0.99))
+
+# Box plot of average avocado price per year
+
+avg_avocado_box <- ggplot(avg_avocados, aes(factor(year), AveragePrice)) + geom_boxplot(aes(fill = factor(year)), width = 0.75) + labs(title="Average Price of Avocados Per Year", x="Year", y="Price ($)") + scale_fill_brewer(palette="Greens")
+
+print(avg_avocado_box)
+
+```
+
+## Compare organic to conventional avocados
+
+
+```{r}
+
+# Group avocado average prices by organic or conventional
+# Remove above 95th percentile
+av_types <- avocados %>%
+  select(AveragePrice,type) %>%
+  group_by(type) %>%
+  filter(AveragePrice < quantile(AveragePrice, 0.95))
+
+# Box plot 
+type_avocado_box <- ggplot(av_types, aes(factor(type), AveragePrice)) + geom_boxplot(aes(fill = factor(type)), width = 0.5, outlier.colour = "#006600", outlier.size = 1, outlier.shape = 10, outlier.stroke = 2) + labs(title="Average Price of Avocados: Organic vs Conventional", x="Type", y="Price ($)") + scale_fill_brewer(palette="Greens")
+
+print(type_avocado_box)
+
+```
+
+>>>>>>> a706a340982ef123e6208d336777af3f51aeb535
